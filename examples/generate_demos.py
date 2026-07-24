@@ -33,15 +33,21 @@ def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
     print("Loading VieNeu...", flush=True)
     vieneu = Vieneu(backend="onnx")
-    voices = VoiceCatalog(vieneu).list()
+    cat = VoiceCatalog(vieneu)
+    voices = cat.list()
     print(f"{len(voices)} voices -> {OUT_DIR}\n", flush=True)
 
     for i, v in enumerate(voices, 1):
         vid, name, style = v["voice_id"], v["name"], (v["style"] or "tu_nhien")
+        out = os.path.join(OUT_DIR, f"{vid}.mp3")
+        if os.path.exists(out):
+            print(f"[{i:2}/{len(voices)}] {vid:<12} exists — skip", flush=True)
+            continue
         text = DEMO_TEXT.format(name=name)
         t0 = time.time()
-        wav = np.asarray(vieneu.infer(text=text, voice=name, style=style), dtype=np.float32)
-        with open(os.path.join(OUT_DIR, f"{vid}.mp3"), "wb") as fh:
+        # resolve() -> a name (preset) or a {speaker_emb, codes} dict (cloned voice)
+        wav = np.asarray(vieneu.infer(text=text, voice=cat.resolve(vid), style=style), dtype=np.float32)
+        with open(out, "wb") as fh:
             fh.write(audio.encode_mp3(wav, SAMPLE_RATE, 128))
         print(f"[{i:2}/{len(voices)}] {vid:<12} {style:<11} "
               f"{wav.shape[0] / SAMPLE_RATE:4.1f}s  ({time.time() - t0:4.1f}s)", flush=True)

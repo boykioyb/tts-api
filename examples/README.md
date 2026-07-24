@@ -25,6 +25,10 @@ compare them directly:
 | [quang-son.mp3](demos/quang-son.mp3) | Quang Sơn | male | Trung | tu_nhien |
 | [ngoc-tran.mp3](demos/ngoc-tran.mp3) | Ngọc Trân | female | Trung | tu_nhien |
 
+Cloned voices enrolled via [`enroll_voice.py`](enroll_voice.py) get demos too —
+e.g. `demos/gia-bao.mp3` (Gia Bảo). The generator resolves each voice through the
+catalog, so a cloned voice's precomputed embedding is used automatically.
+
 ## Regenerate
 
 ```bash
