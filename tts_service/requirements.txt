@@ -1,0 +1,23 @@
+# gRPC runtime + codegen (codegen used at image build time)
+grpcio==1.66.2
+grpcio-tools==1.66.2
+grpcio-health-checking==1.66.2
+grpcio-reflection==1.66.2
+protobuf>=5.27,<6
+
+# audio / numerics
+numpy>=1.26
+soundfile>=0.12
+lameenc>=1.7    # MP3 encoding (LAME bindings, no system ffmpeg needed)
+soxr>=0.5       # high-quality resampling for output_format sample rates
+
+# The Vietnamese TTS model (CPU / ONNX backend by default, torch-free).
+# For GPU, install torch/torchaudio/transformers per the VieNeu README instead.
+vieneu
+
+# Voice cloning (ref_audio) needs the speaker encoder, which requires torch +
+# torchaudio even on the onnx backend. Preset voices do NOT need these. Uncomment
+# to enable /v1/tts/clone (adds ~800 MB to the image):
+#   --extra-index-url https://download.pytorch.org/whl/cpu
+#   torch
+#   torchaudio

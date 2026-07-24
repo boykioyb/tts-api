@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package tts.v1;
+
+// Contract between the FastAPI gateway (client) and the VieNeu TTS worker (server).
+service TtsService {
+  // One-shot synthesis. Returns the whole clip encoded per `format`.
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+
+  // Real-time synthesis. Maps to VieNeu `infer_stream`; each message is a raw
+  // float32 PCM chunk @ sample_rate. Terminated by a message with is_final=true.
+  rpc SynthesizeStream(SynthesizeRequest) returns (stream AudioChunk);
+
+  // Preset voices available on the worker.
+  rpc ListVoices(ListVoicesRequest) returns (ListVoicesResponse);
+}
+
+enum AudioFormat {
+  AUDIO_FORMAT_WAV = 0;      // container: WAV / PCM_16
+  AUDIO_FORMAT_PCM_F32 = 1;  // raw little-endian float32 samples, no header
+  AUDIO_FORMAT_MP3 = 2;      // MPEG-1 Layer III (audio/mpeg)
+}
+
+message SynthesizeRequest {
+  string text = 1;          // required
+  string voice = 2;         // preset voice_id (slug) or name; ignored when ref_audio is set
+  string style = 3;         // tu_nhien | tin_tuc | doc_truyen
+  bytes ref_audio = 4;      // optional 3-8s WAV clip for voice cloning
+  bool denoise = 5;         // denoise the ref clip before cloning
+  AudioFormat format = 6;   // desired encoding for the unary response
+  int32 target_sample_rate = 7;  // resample to this rate; 0 = keep native (48 kHz)
+  int32 mp3_bitrate_kbps = 8;     // MP3 only; 0 = default (128)
+}
+
+message SynthesizeResponse {
+  bytes audio = 1;
+  int32 sample_rate = 2;
+  AudioFormat format = 3;
+  int32 num_samples = 4;
+}
+
+message AudioChunk {
+  bytes audio = 1;          // raw float32 PCM, empty on the final marker
+  int32 sample_rate = 2;
+  bool is_final = 3;
+}
+
+message ListVoicesRequest {}
+
+message VoiceInfo {
+  string voice_id = 1;      // stable slug id, e.g. "pham-tuyen"
+  string name = 2;          // human name / VieNeu key, e.g. "Phạm Tuyên"
+  string description = 3;
+  string gender = 4;
+  string region = 5;        // ElevenLabs "accent" analog
+  string style = 6;         // tu_nhien | tin_tuc | doc_truyen
+  string category = 7;      // "premade" for presets
+}
+
+message ListVoicesResponse {
+  repeated VoiceInfo voices = 1;
+}

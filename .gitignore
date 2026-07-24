@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated gRPC stubs (built at image build time via scripts/gen_protos.sh)
+**/app/generated/
+
+# Local env / secrets
+.env
+
+# Generated audio artifacts (reproducible via the example scripts)
+examples/demos/
+examples/samples/
+*.mp3
+*.wav
+
+# Model weight cache
+hf-cache/

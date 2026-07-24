@@ -1,0 +1,50 @@
+services:
+  tts-service:
+    build:
+      context: .
+      dockerfile: tts_service/Dockerfile
+    environment:
+      TTS_BACKEND: ${TTS_BACKEND:-onnx}
+      TTS_PRECISION: ${TTS_PRECISION:-fp32}
+      TTS_DEFAULT_VOICE: ${TTS_DEFAULT_VOICE:-Phạm Tuyên}
+      TTS_DEFAULT_STYLE: ${TTS_DEFAULT_STYLE:-tu_nhien}
+      TTS_MAX_WORKERS: ${TTS_MAX_WORKERS:-4}
+    volumes:
+      # Persist downloaded model weights so restarts don't re-download from HF.
+      - hf-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      # First boot downloads model weights; give it room before failing.
+      start_period: 300s
+    restart: unless-stopped
+    # --- GPU (optional): uncomment, and build with a torch/CUDA image + deps ---
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      GATEWAY_TTS_GRPC_TARGET: tts-service:50051
+      GATEWAY_REQUEST_TIMEOUT: ${GATEWAY_REQUEST_TIMEOUT:-120}
+      GATEWAY_PUBLIC_BASE_URL: ${GATEWAY_PUBLIC_BASE_URL:-http://localhost:${GATEWAY_HOST_PORT:-8600}}
+      GATEWAY_FILES_DIR: /tmp/tts-files
+    # Published on the host at GATEWAY_HOST_PORT (default 8600); container stays 8000.
+    ports:
+      - "${GATEWAY_HOST_PORT:-8600}:8000"
+    depends_on:
+      tts-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
