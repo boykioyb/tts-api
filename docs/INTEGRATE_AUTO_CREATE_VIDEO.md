@@ -17,7 +17,7 @@ configuration, not code** — you point the existing client at this gateway.
 >    ```
 >    TTS_PROVIDER=lucylab
 >    LUCYLAB_ENDPOINT=http://localhost:8600/json-rpc
->    VIETNAMESE_VOICEID=quang-anh
+>    VIETNAMESE_VOICEID=gia-bao
 >    VIETNAMESE_API_KEY=local-no-auth      # any non-empty value; auth is disabled server-side
 >    LUCYLAB_POLL_INTERVAL_MS=2000
 >    LUCYLAB_POLL_TIMEOUT_MS=600000        # 10 min: survives model cold-start on first run
@@ -44,7 +44,7 @@ configuration, not code** — you point the existing client at this gateway.
    ```bash
    curl -s http://localhost:8600/v1/voices | python3 -m json.tool
    ```
-   You should see `"voice_id": "quang-anh"` (the enrolled clone) among the presets.
+   You should see `"voice_id": "gia-bao"` (the enrolled clone) among the presets.
 
 ## What to configure in Auto-Create-Video
 
@@ -53,7 +53,7 @@ Only `.env` changes (see the agent prompt above). Key points, from first princip
 | Setting | Value | Why |
 |---------|-------|-----|
 | `LUCYLAB_ENDPOINT` | `http://localhost:8600/json-rpc` | redirect the existing client to this gateway |
-| `VIETNAMESE_VOICEID` | `quang-anh` | the enrolled voice id (or any id from `/v1/voices`) |
+| `VIETNAMESE_VOICEID` | `gia-bao` | the enrolled voice id (or any id from `/v1/voices`) |
 | `VIETNAMESE_API_KEY` | any non-empty string | config validation requires it; the server ignores it |
 | `LUCYLAB_POLL_TIMEOUT_MS` | `600000` | first request loads the model (minutes) — see cold-start |
 | `TTS_CONCURRENCY` | `1` | the worker processes one clip at a time |
@@ -88,7 +88,7 @@ several minutes). Two ways to avoid a poll timeout:
 ```bash
 # 1) submit
 ID=$(curl -s -X POST http://localhost:8600/json-rpc -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":"1","method":"ttsLongText","input":{"text":"Xin chào, đây là bản tin công nghệ.","userVoiceId":"quang-anh","speed":1}}' \
+  -d '{"jsonrpc":"2.0","id":"1","method":"ttsLongText","input":{"text":"Xin chào, đây là bản tin công nghệ.","userVoiceId":"gia-bao","speed":1}}' \
   | python3 -c 'import sys,json;print(json.load(sys.stdin)["result"]["projectExportId"])')
 echo "job: $ID"
 
