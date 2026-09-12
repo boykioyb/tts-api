@@ -158,6 +158,16 @@ stored in `tts_service/app/data/custom_voices.json`; after that the voice:
 - is served **torch-free** — the embedding is precomputed, so no reference clip (and
   no torch) is needed at synthesis time. Only *enrolling* needs torch + torchaudio.
 
+The repo ships with these cloned voices already enrolled in `custom_voices.json`
+(usable out of the box, no torch required):
+
+| `voice_id`  | Name     | Gender | Region  | Default style | Notes                          |
+|-------------|----------|--------|---------|---------------|--------------------------------|
+| `gia-bao`   | Gia Bảo  | male   | Bắc     | tu_nhien      | dẫn tin công nghệ (cloned)     |
+| `jessica`   | Jessica  | female | English | tu_nhien      | English female voice (cloned)  |
+
+Enroll your own with the script below:
+
 ```bash
 # ref clip should be a clean 3-8s wav
 python examples/enroll_voice.py --ref clip.wav --name "Sora Narrator" \
