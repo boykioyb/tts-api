@@ -43,6 +43,11 @@ class TtsEngine:
             # Accept either a voice_id (slug) or a raw name; VieNeu needs the name.
             kwargs["voice"] = self.catalog.resolve(voice or config.DEFAULT_VOICE)
             kwargs["style"] = style or config.DEFAULT_STYLE
+        # Sampling knobs (see config). Steadier than VieNeu's random defaults; the
+        # infer variants all accept temperature/top_k and tolerate the rest via **kwargs.
+        kwargs["temperature"] = config.TEMPERATURE
+        kwargs["top_k"] = config.TOP_K
+        kwargs["repetition_penalty"] = config.REPETITION_PENALTY
         return kwargs
 
     def synthesize(self, text: str, voice: str | None = None, style: str | None = None,

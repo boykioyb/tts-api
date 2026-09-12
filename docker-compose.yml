@@ -8,6 +8,9 @@ services:
       TTS_PRECISION: ${TTS_PRECISION:-fp32}
       TTS_DEFAULT_VOICE: ${TTS_DEFAULT_VOICE:-Phạm Tuyên}
       TTS_DEFAULT_STYLE: ${TTS_DEFAULT_STYLE:-tu_nhien}
+      TTS_TEMPERATURE: ${TTS_TEMPERATURE:-0.7}
+      TTS_TOP_K: ${TTS_TOP_K:-40}
+      TTS_REPETITION_PENALTY: ${TTS_REPETITION_PENALTY:-1.3}
       TTS_MAX_WORKERS: ${TTS_MAX_WORKERS:-4}
     volumes:
       # Persist downloaded model weights so restarts don't re-download from HF.
